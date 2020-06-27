@@ -27,7 +27,23 @@
         },
         methods: {
             sendFile() {
-                // todo
+                if (this.file) {
+                    let formData = new FormData();
+                    formData.append('file', this.file);
+
+                    axios.post(
+                        'api/send-file',
+                        formData,
+                        {
+                            headers: {
+                                'content-type':
+                                    'multipart/form-data',
+                            }
+                        }
+                    ).then(response => {
+                        // test
+                    })
+                }
             }
         }
     }
