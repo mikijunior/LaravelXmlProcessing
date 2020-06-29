@@ -1,19 +1,37 @@
 <template>
-    <div class="uploadForm">
-        <b-form-file
-            v-model="file"
-            :state="Boolean(file)"
-            placeholder="Choose a Excel file or drop it here..."
-            drop-placeholder="Drop Excel file here..."
-            accept=".xls, .xlsx"
-            required
-        />
-        <b-button
-            @click.prevent="sendFile"
-            class="ml-2 mr-2"
-        >
-            Upload
-        </b-button>
+    <div>
+        <div class="uploadForm">
+            <b-form-file
+                v-model="file"
+                :state="Boolean(file)"
+                placeholder="Choose a Excel file or drop it here..."
+                drop-placeholder="Drop Excel file here..."
+                accept=".xls, .xlsx"
+                required
+            />
+            <b-button
+                @click.prevent="sendFile"
+                class="ml-2 mr-2"
+            >
+                Upload
+            </b-button>
+
+            <b-alert
+                :show="dismissCountDown"
+                dismissible
+                variant="warning"
+                @dismissed="dismissCountDown=0"
+                @dismiss-count-down="countDownChanged"
+            >
+                <p>Imported {{ importedEntries }} rows. Duplicates: {{ duplicateEntries }}</p>
+                <b-progress
+                    variant="warning"
+                    :max="dismissSecs"
+                    :value="dismissCountDown"
+                    height="4px"
+                ></b-progress>
+            </b-alert>
+        </div>
     </div>
 </template>
 
@@ -23,6 +41,10 @@
         data() {
             return {
                 file: null,
+                dismissSecs: 10,
+                dismissCountDown: 0,
+                importedEntries: 0,
+                duplicateEntries: 0,
             };
         },
         methods: {
@@ -41,10 +63,15 @@
                             }
                         }
                     ).then(response => {
-                        // test
+                        this.importedEntries = response.data.imported;
+                        this.duplicateEntries = response.data.duplicatedRows;
+                        this.dismissCountDown = this.dismissSecs;
                     })
                 }
-            }
+            },
+            countDownChanged(dismissCountDown) {
+                this.dismissCountDown = dismissCountDown;
+            },
         }
     }
 </script>

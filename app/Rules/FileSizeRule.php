@@ -27,8 +27,8 @@ class FileSizeRule implements Rule
     private function getMaxAllowedFileSize(): int
     {
         return min(
-            $this->convertPHPSizeToBytes(ini_get('post_max_size')),
-            $this->convertPHPSizeToBytes(ini_get('upload_max_filesize'))
+            $this->convertPHPSizeToBytes(ini_get('post_max_size') ?: ''),
+            $this->convertPHPSizeToBytes(ini_get('upload_max_filesize') ?: '')
         );
     }
 
@@ -38,7 +38,7 @@ class FileSizeRule implements Rule
      * @param string $size
      * @return integer The value in bytes
      */
-    private function convertPHPSizeToBytes($size): int
+    private function convertPHPSizeToBytes(string $size): int
     {
         $sizeSuffix = strtoupper(substr($size, -1));
 
@@ -46,7 +46,7 @@ class FileSizeRule implements Rule
             return (int)$size;
         }
 
-        $sizeValue = substr($size, 0, -1);
+        $sizeValue = (int)substr($size, 0, -1);
 
         switch ($sizeSuffix) {
             case 'P':
